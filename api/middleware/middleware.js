@@ -16,6 +16,9 @@ function logger(req, res, next) {
 }
 
 async function validateUserId(req, res, next) {
+  // checks the database to make sure there is a user with that id.
+  // if id valid, stores user object as `req.user` and allows the request to continue
+  // if id invalid, responds with status `404` and `{ message: "user not found" }`
   try {
     const user = await User.getById(req.params.id)
     if (!user) {
@@ -34,9 +37,15 @@ async function validateUserId(req, res, next) {
 }
 
 function validateUser(req, res, next) {
-  // DO YOUR MAGIC
-  console.log('validateUser middleware')
-  next()
+  // Validates body on a request to create or update user
+  // if req body lacks required name field, responds with 400 and { message: "missing required name field" }
+  const { name } = req.body
+  if (!name || !name.trim()) {
+    res.status(400).json({ message: 'missing required name field' })
+  } else {
+    req.name = name.trim()
+    next()
+  }
 }
 
 function validatePost(req, res, next) {
