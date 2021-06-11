@@ -49,9 +49,15 @@ function validateUser(req, res, next) {
 }
 
 function validatePost(req, res, next) {
-  // DO YOUR MAGIC
-    console.log('validatePost middleware')
+  // Validates the body on a request to create a new post
+  // if req body lacks required text field, responds with 400 and { message: "missing required text field" }
+  const { text } = req.body
+  if (!text || !text.trim()) {
+    res.status(400).json({ message: 'missing required text field' })
+  } else {
+    req.text = text.trim()
     next()
+  }
 }
 
 // do not forget to expose these functions to other modules
