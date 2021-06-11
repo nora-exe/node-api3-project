@@ -45,6 +45,7 @@ router.put('/:id', validateUserId, validateUser, (req, res, next) => {
 });
 
 router.delete('/:id', validateUserId, async (req, res, next) => {
+  // Deletes a user by ID and sends a confirmation msg
   try {
     await User.remove(req.params.id)
     res.status(200).json({message: 'User has been deleted.'})
@@ -53,13 +54,17 @@ router.delete('/:id', validateUserId, async (req, res, next) => {
   }
 });
 
-router.get('/:id/posts', validateUserId, validatePost, (req, res, next) => {
-  // RETURN THE ARRAY OF USER POSTS
-  // this needs a middleware to verify user id
-  console.log(req.user);
+router.get('/:id/posts', validateUserId, async (req, res, next) => {
+  // Returns array of user posts
+  try {
+    const result = await User.getUserPosts(req.params.id)
+    res.json(result)
+  } catch (err) {
+    next(err)
+  }
 });
 
-router.post('/:id/posts', validateUserId, validatePost, (req, res, next) => {
+router.post('/:id/posts', validateUserId, validatePost, (req, res) => {
   // RETURN THE NEWLY CREATED USER POST
   // this needs a middleware to verify user id
   // and another middleware to check that the request body is valid
@@ -68,7 +73,7 @@ router.post('/:id/posts', validateUserId, validatePost, (req, res, next) => {
 });
 
 // Gabe's error-handling middleware
-router.use((err, req, res, next) => {
+router.use((err, req, res) => {
   res.status(err.status || 500).json({
     customMessage: 'something tragic occurred',
     message: err.message,
