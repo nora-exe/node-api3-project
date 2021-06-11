@@ -1,6 +1,6 @@
 const express = require('express');
-
-const User = require('../users/users-model');
+const router = express.Router();
+const User = require('./users-model');
 const Post = require('../posts/posts-model');
 const {
   validateUserId,
@@ -8,10 +8,12 @@ const {
   validatePost
 } = require('../middleware/middleware');
 
-const router = express.Router();
-
-router.get('/', (req, res) => {
-  // RETURN AN ARRAY WITH ALL THE USERS
+router.get('/', (req, res, next) => {
+  User.get()
+    .then(users => {
+      res.json(users)
+    })
+    .catch(next)
 });
 
 router.get('/:id', validateUserId, (req, res) => {
@@ -52,6 +54,15 @@ router.post('/:id/posts', validateUserId, validatePost, (req, res) => {
   console.log(req.user)
   console.log(req.text)
 });
+
+// Gabe's error-handling middleware
+router.use((err, req, res, next) => {
+  res.status(err.status || 500).json({
+    customMessage: 'something tragic occurred',
+    message: err.message,
+    stack: err.stack
+  })
+})
 
 // do not forget to export the router
 module.exports = router;
