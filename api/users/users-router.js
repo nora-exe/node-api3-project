@@ -9,6 +9,7 @@ const {
 } = require('../middleware/middleware');
 
 router.get('/', (req, res, next) => {
+  // returns array of users
   User.get()
     .then(users => {
       res.json(users)
@@ -17,15 +18,17 @@ router.get('/', (req, res, next) => {
 });
 
 router.get('/:id', validateUserId, (req, res) => {
-  // RETURN THE USER OBJECT
-  // this needs a middleware to verify user id
-  console.log(req.user);
+  // validateUserId() checks if id exists
+  res.json(req.user)
 });
 
-router.post('/', validateUser, (req, res) => {
-  // RETURN THE NEWLY CREATED USER OBJECT
-  // this needs a middleware to check that the request body is valid
-  console.log(req.name);
+router.post('/', validateUser, (req, res, next) => {
+  // validateUser() checks if request body is valid
+  User.insert({ name: req.name })
+    .then(newUser => {
+      res.status(201).json(newUser)
+    })
+    .catch(next)
 });
 
 router.put('/:id', validateUserId, validateUser, (req, res) => {
