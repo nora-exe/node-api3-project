@@ -48,7 +48,7 @@ router.delete('/:id', validateUserId, async (req, res, next) => {
   // Deletes a user by ID and sends a confirmation msg
   try {
     await User.remove(req.params.id)
-    res.status(200).json({message: 'User has been deleted.'})
+    res.json(req.user)
   } catch (err) {
     next(err)
   }
